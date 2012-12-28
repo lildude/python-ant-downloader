@@ -36,7 +36,7 @@ import sys
 import pkg_resources
 import logging
 
-_log = logging.getLogger("antd.cfg")
+_log = logging.getLogger("antd")
 _cfg = ConfigParser.SafeConfigParser()
 
 CONFIG_FILE_VERSION = 1
