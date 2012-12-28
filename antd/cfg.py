@@ -95,7 +95,14 @@ def create_hardware():
         _log.warning("Failed to find Garmin nRF24AP2 (newer) USB Stick.", exc_info=show_trace)
         _log.warning("Looking for nRF24AP1 (older) Serial USB Stick.")
         tty = _cfg.get("antd.hw", "serial_device")
-        return hw.SerialHardware(tty, 115200)
+        #return hw.SerialHardware(tty, 115200)
+        try: 
+            return hw.SerialHardware(tty, 115200)
+        except Exception as e:
+            show_trace = True if logging.getLevelName(_log.getEffectiveLevel()) is "DEBUG" else False
+            _log.error(e.message, exc_info=show_trace)
+            sys.exit()
+
 
 def create_ant_core():
     import antd.ant as ant
