@@ -91,7 +91,8 @@ def create_hardware():
         bulk_endpoint = int(_cfg.get("antd.hw", "bulk_endpoint"), 0)
         return hw.UsbHardware(id_vendor, id_product, bulk_endpoint)
     except hw.NoUsbHardwareFound:
-        _log.warning("Failed to find Garmin nRF24AP2 (newer) USB Stick.", exc_info=True)
+        show_trace = True if logging.getLevelName(_log.getEffectiveLevel()) is "DEBUG" else False
+        _log.warning("Failed to find Garmin nRF24AP2 (newer) USB Stick.", exc_info=show_trace)
         _log.warning("Looking for nRF24AP1 (older) Serial USB Stick.")
         tty = _cfg.get("antd.hw", "serial_device")
         return hw.SerialHardware(tty, 115200)
