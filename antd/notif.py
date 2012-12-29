@@ -56,19 +56,19 @@ class NotifPlugin(plugin.Plugin):
                 n = pynotify.Notification(
                     "Ant+ Downloader",
                     "Uploaded files [%s] to Garmin Connect" % ", ".join(filenames),
-                    "notification-message-im")
+                    "dialog-information")
                 n.show()
             elif format == "notif_fetch":
                 n = pynotify.Notification(
                     "Ant+ Downloader",
                     "Uploaded files [%s] to FetchEveryone" % ", ".join(filenames),
-                    "notification-message-im")
+                    "dialog-information")
                 n.show()
             else:
                 n = pynotify.Notification(
                     "Ant+ Downloader",
                     "Files [%s] processed" % ", ".join(filenames), 
-                    "notification-message-im")
+                    "dialog-information")
                 n.show()
         finally:
             return files
