@@ -68,7 +68,8 @@ def downloader():
         antd.cfg.create_garmin_connect_plugin(),
         antd.cfg.create_strava_plugin(),
         antd.cfg.create_tcx_plugin(),
-        antd.cfg.create_notification_plugin()
+        antd.cfg.create_notification_plugin(),
+        antd.cfg.create_fetcheveryone_plugin()
     )
     
     # create an ANTFS host from configuration
