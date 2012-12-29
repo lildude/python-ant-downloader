@@ -101,7 +101,7 @@ def create_hardware():
         except Exception as e:
             show_trace = True if logging.getLevelName(_log.getEffectiveLevel()) is "DEBUG" else False
             _log.error(e.message, exc_info=show_trace)
-            sys.exit()
+            sys.exit(1)
 
 
 def create_ant_core():
@@ -173,6 +173,17 @@ def create_notification_plugin():
             import antd.notif as notif
             notif = notif.NotifPlugin()
             return notif
+    except ConfigParser.NoSectionError: pass
+
+def create_fetcheveryone_plugin():
+    try:
+        if _cfg.getboolean("antd.fetcheveryone", "enabled"):
+            import antd.fetcheveryone as connect
+            client = connect.FetcheveryoneConnect()
+            client.email = _cfg.get("antd.fetcheveryone", "email")
+            client.password = _cfg.get("antd.fetcheveryone", "password")
+            client.cache = os.path.expanduser(_cfg.get("antd.fetcheveryone", "cache")) 
+            return client
     except ConfigParser.NoSectionError: pass
 
 def get_path(section, key, file="", tokens={}):
