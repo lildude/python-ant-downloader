@@ -43,7 +43,6 @@ class FetcheveryoneConnect(plugin.Plugin):
 
     email = None
     password = None
-    open_training = None
 
     logged_in = False
     login_invalid = False
@@ -57,9 +56,7 @@ class FetcheveryoneConnect(plugin.Plugin):
                 poster.streaminghttp.StreamingHTTPHandler,
                 poster.streaminghttp.StreamingHTTPRedirectHandler,
                 poster.streaminghttp.StreamingHTTPSHandler)
-        # add headers to exactly match firefox, seems to work again
-        # no idea why. garmin does accept our login without these
-        # headers by for some reason json is not parsed ?!
+        # add headers to exactly match firefox
         self.opener.addheaders = [
                 ('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'),
                 ('Referer', 'http://www.fetcheverone.com/index.php'),
