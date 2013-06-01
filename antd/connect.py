@@ -161,9 +161,10 @@ class StravaConnect(plugin.Plugin):
         if self.logged_in: return
         self.server.connect(self.smtp_server, self.smtp_port)
         self.server.ehlo()
-        self.server.starttls()
-        self.server.ehlo()
-        self.server.login(self.smtp_username, self.smtp_password)
+        if self.smtp_password:
+            self.server.starttls()
+            self.server.ehlo()
+            self.server.login(self.smtp_username, self.smtp_password)
         self.logged_in = True
     
     def upload(self, format, file_name):
