@@ -496,7 +496,7 @@ class Core(object):
             elif msg == "Connection timed out": return False #libusb01
             else: raise
 
-    def recv(self, timeout=500):
+    def recv(self, timeout=1000):
         """
         A generator which return commands
         parsed from input stream of ant device.
