@@ -1,3 +1,8 @@
+# coding=utf-8
+# 
+# NOTE: This doesn't work yet as the login steps need work
+# 
+# 
 # Copyright (c) 2013, Colin Seymour.
 # All rights reserved.
 # 
@@ -50,17 +55,22 @@ class Strava(plugin.Plugin):
     authenticity_token = None
 
     def __init__(self):
+        """
         import poster.streaminghttp
         cookies = cookielib.CookieJar()
         cookie_handler = urllib2.HTTPCookieProcessor(cookies)
-        """
         self.opener = urllib2.build_opener(
                 cookie_handler,
                 poster.streaminghttp.StreamingHTTPHandler,
                 poster.streaminghttp.StreamingHTTPRedirectHandler,
                 poster.streaminghttp.StreamingHTTPSHandler)
         """
-        self.opener = urllib2.build_opener( cookie_handler )
+        cookies = cookielib.CookieJar()
+        self.opener = urllib2.build_opener(
+            urllib2.HTTPHandler(),
+            urllib2.HTTPSHandler(),
+            urllib2.HTTPCookieProcessor(cookies)
+            )
         # add headers to exactly match firefox
         self.opener.addheaders = [
                 ('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'),
@@ -90,7 +100,14 @@ class Strava(plugin.Plugin):
         if self.login_invalid: raise InvalidLogin()
         # get session cookies
         _log.debug("Fetching cookies from Strava.")
-        resp = self.opener.open("https://www.strava.com/login") # TODO: need to find out how to read the data here
+        resp = self.opener.open("https://www.strava.com/login")
+        # decode our compressed response so we can read it
+        if resp.info().get('Content-Encoding') == 'gzip':
+            from StringIO import StringIO
+            import gzip
+            buf = StringIO(resp.read())
+            f = gzip.GzipFile(fileobj=buf)
+            resp = f.read()
         # Grab the authenticity_token from the Facebook login form
         begin = resp.find('<input name="authenticity_token" type="hidden" value="')
         end = resp.find("\" /></div>\n<div class='facebook'>")
@@ -109,8 +126,13 @@ class Strava(plugin.Plugin):
 
         # verify we're logged in - if we're logged in, we'll have "Log Out" at the top of the response page
         _log.debug("Checking if login was successful.")
+        # decode our compressed response so we can read it
+        if reply.info().get('Content-Encoding') == 'gzip':
+            buf = StringIO(reply.read())
+            f = gzip.GzipFile(fileobj=buf)
+            reply = f.read()
 
-        if reply.read().find('Log Out') == -1:
+        if reply.find('Log Out') == -1:
             self.login_invalid = True
             raise InvalidLogin()
         else:
