@@ -54,8 +54,7 @@ class Strava(plugin.Plugin):
 
     authenticity_token = None
 
-    def __init__(self):
-        """
+    def __init__(self):     
         import poster.streaminghttp
         cookies = cookielib.CookieJar()
         cookie_handler = urllib2.HTTPCookieProcessor(cookies)
@@ -64,13 +63,7 @@ class Strava(plugin.Plugin):
                 poster.streaminghttp.StreamingHTTPHandler,
                 poster.streaminghttp.StreamingHTTPRedirectHandler,
                 poster.streaminghttp.StreamingHTTPSHandler)
-        """
-        cookies = cookielib.CookieJar()
-        self.opener = urllib2.build_opener(
-            urllib2.HTTPHandler(),
-            urllib2.HTTPSHandler(),
-            urllib2.HTTPCookieProcessor(cookies)
-            )
+
         # add headers to exactly match firefox
         self.opener.addheaders = [
                 ('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'),
@@ -101,6 +94,7 @@ class Strava(plugin.Plugin):
         # get session cookies
         _log.debug("Fetching cookies from Strava.")
         resp = self.opener.open("https://www.strava.com/login")
+
         # decode our compressed response so we can read it
         if resp.info().get('Content-Encoding') == 'gzip':
             from StringIO import StringIO
@@ -108,6 +102,8 @@ class Strava(plugin.Plugin):
             buf = StringIO(resp.read())
             f = gzip.GzipFile(fileobj=buf)
             resp = f.read()
+        else:
+            resp = resp.read()
         # Grab the authenticity_token from the Facebook login form
         begin = resp.find('<input name="authenticity_token" type="hidden" value="')
         end = resp.find("\" /></div>\n<div class='facebook'>")
@@ -131,6 +127,8 @@ class Strava(plugin.Plugin):
             buf = StringIO(reply.read())
             f = gzip.GzipFile(fileobj=buf)
             reply = f.read()
+        else:
+            reply = reply.read()
 
         if reply.find('Log Out') == -1:
             self.login_invalid = True
@@ -145,7 +143,7 @@ class Strava(plugin.Plugin):
                 "_method": "post",
                 "new_uploader": 1,
                 "authenticity_token": self.authenticity_token,
-                "files": file
+                "files[]": file
             }
             data, headers = poster.encode.multipart_encode(upload_dict)
             _log.info("Uploading %s to Strava.", file_name)
