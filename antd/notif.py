@@ -40,7 +40,7 @@ class NotifPlugin(plugin.Plugin):
     def __init__(self):
         self._enabled = True
         if not pynotify.init("icon-summary-body"):
-            _log.error("Couldn't enabled pynotify, disabling")
+            _log.error("Couldn't enable pynotify, disabling")
             self._enabled = False
 
     def data_available(self, device_sn, format, files):
@@ -62,6 +62,12 @@ class NotifPlugin(plugin.Plugin):
                 n = pynotify.Notification(
                     "Ant+ Downloader",
                     "Uploaded files [%s] to FetchEveryone" % ", ".join(filenames),
+                    "dialog-information")
+                n.show()
+            elif format == "notif_strava":
+                n = pynotify.Notification(
+                    "Ant+ Downloader",
+                    "Uploaded files [%s] to Strava" % ", ".join(filenames),
                     "dialog-information")
                 n.show()
             else:

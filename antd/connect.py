@@ -125,7 +125,7 @@ class GarminConnect(plugin.Plugin):
             request = urllib2.Request("http://connect.garmin.com/proxy/upload-service-1.1/json/upload/.%s" % format, data, headers)
             self.opener.open(request)
         
-class StravaConnect(plugin.Plugin):
+class StravaEmail(plugin.Plugin):
 
     server = None
     smtp_server = None

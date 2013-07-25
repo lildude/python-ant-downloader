@@ -1,4 +1,4 @@
-# Copyright (c) 2012, Colin Seymour.
+# Copyright (c) 2013, Colin Seymour.
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,9 @@ import glob
 
 import antd.plugin as plugin
 
-_log = logging.getLogger("antd.fetcheverone")
+_log = logging.getLogger("antd.strava")
 
-class Fetcheveryone(plugin.Plugin):
+class Strava(plugin.Plugin):
 
     email = None
     password = None
@@ -47,19 +47,24 @@ class Fetcheveryone(plugin.Plugin):
     logged_in = False
     login_invalid = False
 
+    authenticity_token = None
+
     def __init__(self):
         import poster.streaminghttp
         cookies = cookielib.CookieJar()
         cookie_handler = urllib2.HTTPCookieProcessor(cookies)
+        """
         self.opener = urllib2.build_opener(
                 cookie_handler,
                 poster.streaminghttp.StreamingHTTPHandler,
                 poster.streaminghttp.StreamingHTTPRedirectHandler,
                 poster.streaminghttp.StreamingHTTPSHandler)
+        """
+        self.opener = urllib2.build_opener( cookie_handler )
         # add headers to exactly match firefox
         self.opener.addheaders = [
                 ('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'),
-                ('Referer', 'http://www.fetcheverone.com/index.php'),
+                ('Referer', 'http://www.strava.com/login'),
                 ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
                 ('Accept-Language', 'en-US,en;q=0.8'),
                 ('Accept-Encoding', 'gzip, deflate'),
@@ -74,46 +79,53 @@ class Fetcheveryone(plugin.Plugin):
                 self.login()
                 self.upload(format, file)
                 result.append(file)
-            plugin.publish_data(device_sn, "notif_fetch", files)
+            plugin.publish_data(device_sn, "notif_strava", files)
         except Exception:
-            _log.warning("Failed to upload to Fetcheveryone.", exc_info=True)
+            _log.warning("Failed to upload to Strava.", exc_info=True)
         finally:
             return result
 
     def login(self):
         if self.logged_in: return
         if self.login_invalid: raise InvalidLogin()
+        # get session cookies
+        _log.debug("Fetching cookies from Strava.")
+        resp = self.opener.open("https://www.strava.com/login") # TODO: need to find out how to read the data here
+        # Grab the authenticity_token from the Facebook login form
+        begin = resp.find('<input name="authenticity_token" type="hidden" value="')
+        end = resp.find("\" /></div>\n<div class='facebook'>")
+        self.authenticity_token = resp[begin+len('<input name="authenticity_token" type="hidden" value="'):end].strip()
         # build the login string
         login_dict = {
-            "referrer": "/index.php",
+            "utf8": "✓",
             "email": self.email,
             "password": self.password,
-            "submit": "Log In",
-            "autologin": "autologin",
+            "authenticity_token": self.authenticity_token
         }
         login_str = urllib.urlencode(login_dict)
         # post login credentials
-        _log.debug("Posting login credentials to Fetcheveryone. email=%s", self.email)
-        reply = self.opener.open("http://www.fetcheveryone.com/dologin.php", login_str)
+        _log.debug("Posting login credentials to Strava. email=%s", self.email)
+        reply = self.opener.open("https://www.strava.com/session", login_str)
 
         # verify we're logged in - if we're logged in, we'll have "Log Out" at the top of the response page
         _log.debug("Checking if login was successful.")
 
-        if reply.read().find("Log Out") == -1:
+        if reply.read().find('Log Out') == -1:
             self.login_invalid = True
             raise InvalidLogin()
         else:
             self.logged_in = True
 
-    
     def upload(self, format, file_name):
         import poster.encode
         with open(file_name) as file:
             upload_dict = {
-                "submit": "Upload File",
-                "tcxfile": file
+                "_method": "post",
+                "new_uploader": 1,
+                "authenticity_token": self.authenticity_token,
+                "files": file
             }
             data, headers = poster.encode.multipart_encode(upload_dict)
-            _log.info("Uploading %s to Fetcheveryone.", file_name)
-            request = urllib2.Request("http://www.fetcheveryone.com/training-import-tcx.php", data, headers)
+            _log.info("Uploading %s to Strava.", file_name)
+            request = urllib2.Request("http://app.strava.com/upload/files", data, headers)
             self.opener.open(request)

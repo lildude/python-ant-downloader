@@ -141,19 +141,30 @@ def create_garmin_connect_plugin():
             client = connect.GarminConnect()
             client.username = _cfg.get("antd.connect", "username")
             client.password = _cfg.get("antd.connect", "password")
-            client.cache = os.path.expanduser(_cfg.get("antd.connect", "cache")) 
+            client.cache = os.path.expanduser(_cfg.get("antd.connect", "cache"))
             return client 
+    except ConfigParser.NoSectionError: pass
+
+def create_strava_email_plugin():
+    try:
+        if _cfg.getboolean("antd.strava_email", "enabled"):
+            import antd.strava_email as connect
+            client = connect.StravaEmail()
+            client.smtp_server = _cfg.get("antd.strava", "smtp_server")
+            client.smtp_port = _cfg.get("antd.strava", "smtp_port")
+            client.smtp_username = _cfg.get("antd.strava", "smtp_username")
+            client.smtp_password = _cfg.get("antd.strava", "smtp_password")
+            return client
     except ConfigParser.NoSectionError: pass
 
 def create_strava_plugin():
     try:
         if _cfg.getboolean("antd.strava", "enabled"):
-            import antd.connect as connect
-            client = connect.StravaConnect()
-            client.smtp_server = _cfg.get("antd.strava", "smtp_server")
-            client.smtp_port = _cfg.get("antd.strava", "smtp_port")
-            client.smtp_username = _cfg.get("antd.strava", "smtp_username")
-            client.smtp_password = _cfg.get("antd.strava", "smtp_password")
+            import antd.strava as connect
+            client = connect.Strava()
+            client.username = _cfg.get("antd.strava", "username")
+            client.password = _cfg.get("antd.strava", "password")
+            client.cache = os.path.expanduser(_cfg.get("antd.strava", "cache"))
             return client
     except ConfigParser.NoSectionError: pass
 
@@ -163,7 +174,7 @@ def create_tcx_plugin():
         tcx = tcx.TcxPlugin()
         tcx.tcx_output_dir = os.path.expanduser(_cfg.get("antd.tcx", "tcx_output_dir"))
         try:
-            tcx.cache = os.path.expanduser(_cfg.get("antd.tcx", "cache")) 
+            tcx.cache = os.path.expanduser(_cfg.get("antd.tcx", "cache"))
         except ConfigParser.NoOptionError: pass
         return tcx
 
@@ -179,10 +190,10 @@ def create_fetcheveryone_plugin():
     try:
         if _cfg.getboolean("antd.fetcheveryone", "enabled"):
             import antd.fetcheveryone as connect
-            client = connect.FetcheveryoneConnect()
+            client = connect.Fetcheveryone()
             client.email = _cfg.get("antd.fetcheveryone", "email")
             client.password = _cfg.get("antd.fetcheveryone", "password")
-            client.cache = os.path.expanduser(_cfg.get("antd.fetcheveryone", "cache")) 
+            client.cache = os.path.expanduser(_cfg.get("antd.fetcheveryone", "cache"))
             return client
     except ConfigParser.NoSectionError: pass
 
