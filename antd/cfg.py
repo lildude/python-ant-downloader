@@ -162,7 +162,7 @@ def create_strava_plugin():
         if _cfg.getboolean("antd.strava", "enabled"):
             import antd.strava as connect
             client = connect.Strava()
-            client.username = _cfg.get("antd.strava", "username")
+            client.email = _cfg.get("antd.strava", "email")
             client.password = _cfg.get("antd.strava", "password")
             client.cache = os.path.expanduser(_cfg.get("antd.strava", "cache"))
             return client
