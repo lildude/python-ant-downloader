@@ -1,4 +1,4 @@
-# Copyright (c) 2012, Braiden Kindt.
+# Copyright (c) 2013, Colin Seymour
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without

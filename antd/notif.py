@@ -39,7 +39,7 @@ class NotifPlugin(plugin.Plugin):
 
     def __init__(self):
         self._enabled = True
-        if not pynotify.init("icon-summary-body"):
+        if not pynotify.init("python-ant-downloader"):
             _log.error("Couldn't enable pynotify, disabling")
             self._enabled = False
 
