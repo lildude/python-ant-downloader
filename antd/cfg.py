@@ -1,18 +1,18 @@
 # Copyright (c) 2012, Braiden Kindt.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 #   1. Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
-# 
+#
 #   2. Redistributions in binary form must reproduce the above
 #      copyright notice, this list of conditions and the following
 #      disclaimer in the documentation and/or other materials
 #      provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
 # ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -47,7 +47,7 @@ def write_default_config(target):
     if not os.path.exists(dirname): os.makedirs(dirname)
     with open(target, "w") as file:
         file.write(pkg_resources.resource_string(__name__, "antd.cfg"))
-    
+
 def read(file=None):
     if file is None:
         file = DEFAULT_CONFIG_LOCATION
@@ -66,7 +66,7 @@ def read(file=None):
             new_file = DEFAULT_CONFIG_LOCATION + ".%d" % CONFIG_FILE_VERSION
             write_default_config(new_file)
             _log.warning("Config file version does not match expected version (%d).", CONFIG_FILE_VERSION)
-            _log.warning("If you have issues recommended you replace your configuration with %s", new_file)  
+            _log.warning("If you have issues recommended you replace your configuration with %s", new_file)
             _log.warning("Set [antd] version=%d in your current config file to disable this warning.", CONFIG_FILE_VERSION)
     return read
 
@@ -79,7 +79,7 @@ def init_loggers(force_level=None, out=sys.stdin):
     try:
         for logger, log_level in _cfg.items("antd.logging"):
             level = force_level if force_level is not None else logging.getLevelName(log_level)
-            logging.getLogger(logger).setLevel(level) 
+            logging.getLogger(logger).setLevel(level)
     except ConfigParser.NoSectionError:
         pass
 
@@ -96,7 +96,7 @@ def create_hardware():
         _log.warning("Looking for nRF24AP1 (older) Serial USB Stick.")
         tty = _cfg.get("antd.hw", "serial_device")
         #return hw.SerialHardware(tty, 115200)
-        try: 
+        try:
             return hw.SerialHardware(tty, 115200)
         except Exception as e:
             show_trace = True if logging.getLevelName(_log.getEffectiveLevel()) is "DEBUG" else False
@@ -142,7 +142,7 @@ def create_garmin_connect_plugin():
             client.username = _cfg.get("antd.connect", "username")
             client.password = _cfg.get("antd.connect", "password")
             client.cache = os.path.expanduser(_cfg.get("antd.connect", "cache"))
-            return client 
+            return client
     except ConfigParser.NoSectionError: pass
 
 def create_strava_email_plugin():
@@ -165,6 +165,17 @@ def create_strava_plugin():
             client.email = _cfg.get("antd.strava", "email")
             client.password = _cfg.get("antd.strava", "password")
             client.cache = os.path.expanduser(_cfg.get("antd.strava", "cache"))
+            return client
+    except ConfigParser.NoSectionError: pass
+
+def create_trainingpeaks_plugin():
+    try:
+        if _cfg.getboolean("antd.trainingpeaks", "enabled"):
+            import antd.trainingpeaks as connect
+            client = connect.TrainingPeaks()
+            client.email = _cfg.get("antd.trainingpeaks", "username")
+            client.password = _cfg.get("antd.trainingpeaks", "password")
+            client.cache = os.path.expanduser(_cfg.get("antd.trainingpeaks", "cache"))
             return client
     except ConfigParser.NoSectionError: pass
 
