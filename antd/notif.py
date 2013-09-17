@@ -1,18 +1,18 @@
 # Copyright (c) 2012, Ivan Kelly <ivan@ivankelly.net>
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 #   1. Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
-# 
+#
 #   2. Redistributions in binary form must reproduce the above
 #      copyright notice, this list of conditions and the following
 #      disclaimer in the documentation and/or other materials
 #      provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
 # ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -70,10 +70,16 @@ class NotifPlugin(plugin.Plugin):
                     "Uploaded files [%s] to Strava" % ", ".join(filenames),
                     "dialog-information")
                 n.show()
+            lif format == "notif_trainingpeaks":
+                n = pynotify.Notification(
+                    "Ant+ Downloader",
+                    "Uploaded files [%s] to TrainingPeaks" % ", ".join(filenames),
+                    "dialog-information")
+                n.show()
             else:
                 n = pynotify.Notification(
                     "Ant+ Downloader",
-                    "Files [%s] processed" % ", ".join(filenames), 
+                    "Files [%s] processed" % ", ".join(filenames),
                     "dialog-information")
                 n.show()
         finally:
