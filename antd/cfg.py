@@ -145,18 +145,6 @@ def create_garmin_connect_plugin():
             return client
     except ConfigParser.NoSectionError: pass
 
-def create_strava_email_plugin():
-    try:
-        if _cfg.getboolean("antd.strava_email", "enabled"):
-            import antd.strava_email as connect
-            client = connect.StravaEmail()
-            client.smtp_server = _cfg.get("antd.strava", "smtp_server")
-            client.smtp_port = _cfg.get("antd.strava", "smtp_port")
-            client.smtp_username = _cfg.get("antd.strava", "smtp_username")
-            client.smtp_password = _cfg.get("antd.strava", "smtp_password")
-            return client
-    except ConfigParser.NoSectionError: pass
-
 def create_strava_plugin():
     try:
         if _cfg.getboolean("antd.strava", "enabled"):
