@@ -173,7 +173,7 @@ def create_trainingpeaks_plugin():
         if _cfg.getboolean("antd.trainingpeaks", "enabled"):
             import antd.trainingpeaks as connect
             client = connect.TrainingPeaks()
-            client.email = _cfg.get("antd.trainingpeaks", "username")
+            client.username = _cfg.get("antd.trainingpeaks", "username")
             client.password = _cfg.get("antd.trainingpeaks", "password")
             client.cache = os.path.expanduser(_cfg.get("antd.trainingpeaks", "cache"))
             return client
