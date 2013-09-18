@@ -48,32 +48,27 @@ class NotifPlugin(plugin.Plugin):
 
         if not self._enabled:
             return
-
+        # Updating this everytime I add a new plugin is becoming tedious, so lets
+        # get smarter with this.
+        #
+        # Split the notif_ string by _ and everything after the first will be used
+        # verbatim as the "to" string in the notification. So...
+        #
+        #   notif_Garmin_Connect becomes "Garmin Connect"
+        #   notif_Strava becomes "Strava"
+        #   notif_somewhere becomes "somewhere"
+        #
         if not format.startswith("notif_"): return files
         try:
             filenames = map (lambda(x): os.path.basename(x), files)
-            if format == "notif_connect":
+            #if format == "notif_connect":
+            if format.startswith("notif_"):
+                fields = format.split('_')
+                fields.pop(0)   # Pop off 'notif'
+                dest = ' '.join(fields)
                 n = pynotify.Notification(
-                    "Ant+ Downloader",
-                    "Uploaded files [%s] to Garmin Connect" % ", ".join(filenames),
-                    "dialog-information")
-                n.show()
-            elif format == "notif_fetch":
-                n = pynotify.Notification(
-                    "Ant+ Downloader",
-                    "Uploaded files [%s] to FetchEveryone" % ", ".join(filenames),
-                    "dialog-information")
-                n.show()
-            elif format == "notif_strava":
-                n = pynotify.Notification(
-                    "Ant+ Downloader",
-                    "Uploaded files [%s] to Strava" % ", ".join(filenames),
-                    "dialog-information")
-                n.show()
-            elif format == "notif_trainingpeaks":
-                n = pynotify.Notification(
-                    "Ant+ Downloader",
-                    "Uploaded files [%s] to TrainingPeaks" % ", ".join(filenames),
+                    "Ant+ Downloader: %s" % dest,
+                    "Uploaded files [%s] to %s" % (", ".join(filenames), dest),
                     "dialog-information")
                 n.show()
             else:
