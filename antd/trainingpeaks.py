@@ -34,8 +34,6 @@ import os
 import sys
 import urllib
 import urllib2
-import cookielib
-import glob
 
 import antd.plugin as plugin
 
@@ -46,30 +44,12 @@ class TrainingPeaks(plugin.Plugin):
     username = None
     password = None
 
-    logged_in = False
-    login_invalid = False
-
-    authenticity_token = None
-
     def __init__(self):
-        import poster.streaminghttp
-        cookies = cookielib.CookieJar()
-        cookie_handler = urllib2.HTTPCookieProcessor(cookies)
-        self.opener = urllib2.build_opener(
-                cookie_handler,
-                poster.streaminghttp.StreamingHTTPHandler,
-                poster.streaminghttp.StreamingHTTPRedirectHandler,
-                poster.streaminghttp.StreamingHTTPSHandler)
-
-        # add headers to exactly match firefox
-        self.opener.addheaders = [
-                ('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'),
-                ('Referer', 'http://www.strava.com/login'),
-                ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
-                ('Accept-Language', 'en-US,en;q=0.8'),
-                ('Accept-Encoding', 'gzip, deflate'),
-        ]
-
+        self.headers = {
+                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.8',
+        }
 
     def data_available(self, device_sn, format, files):
         if format not in ("tcx"): return files
@@ -85,15 +65,16 @@ class TrainingPeaks(plugin.Plugin):
             return result
 
     def upload(self, format, file_name):
-        import poster.encode
         with open(file_name) as file:
             upload_dict = {
                 "username": self.username,
-                "password": self.password,
-                "files[]": file
+                "password": self.password
             }
-            data, headers = poster.encode.multipart_encode(upload_dict)
+            auth = urllib.urlencode(upload_dict)
+            data = file.read()
             _log.info("Uploading %s to TrainingPeaks.", file_name)
-            #request = urllib2.Request("https://www.trainingpeaks.com/TPWebServices/EasyFileUpload.ashx?username="+self.username+"password="+self.password, data, headers)
-            request = urllib2.Request("https://www.trainingpeaks.com/TPWebServices/EasyFileUpload.ashx", data, headers)
-            self.opener.open(request)
+            request = urllib2.Request("https://www.trainingpeaks.com/TPWebServices/EasyFileUpload.ashx?"+auth, data, self.headers)
+            resp = urllib2.urlopen(request).read()
+
+            if resp != "OK":
+                raise Exception(resp)
