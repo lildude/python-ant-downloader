@@ -70,7 +70,7 @@ class NotifPlugin(plugin.Plugin):
                     "Uploaded files [%s] to Strava" % ", ".join(filenames),
                     "dialog-information")
                 n.show()
-            lif format == "notif_trainingpeaks":
+            elif format == "notif_trainingpeaks":
                 n = pynotify.Notification(
                     "Ant+ Downloader",
                     "Uploaded files [%s] to TrainingPeaks" % ", ".join(filenames),
