@@ -2,19 +2,19 @@
 
 # Copyright (c) 2012, Braiden Kindt.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 #   1. Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
-# 
+#
 #   2. Redistributions in binary form must reproduce the above
 #      copyright notice, this list of conditions and the following
 #      disclaimer in the documentation and/or other materials
 #      provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
 # ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -39,7 +39,7 @@ def downloader():
     import shutil
     import lxml.etree as etree
     import antd
-    
+
     # command line
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", "-c", nargs=1, metavar="f",
@@ -51,27 +51,28 @@ def downloader():
     parser.add_argument("--force", "-f", action="store_const", const=True,
             help="force a connection with device even if it claims no data available. FOR DEBUG ONLY.")
     args = parser.parse_args()
-    
+
     # load configuration
     cfg = args.config[0] if args.config else None
     if not antd.cfg.read(cfg):
-        print "unable to read config file." 
+        print "unable to read config file."
         parser.print_usage()
         sys.exit(1)
-    
+
     # enable debug if -v used
     if args.verbose: antd.cfg.init_loggers(logging.DEBUG)
     _log = logging.getLogger("antd")
-    
+
     # register plugins, add uploaders and file converters here
     antd.plugin.register_plugins(
         antd.cfg.create_garmin_connect_plugin(),
         antd.cfg.create_strava_plugin(),
         antd.cfg.create_tcx_plugin(),
         antd.cfg.create_notification_plugin(),
-        antd.cfg.create_fetcheveryone_plugin()
+        antd.cfg.create_fetcheveryone_plugin(),
+        antd.cfg.create_trainingpeaks_plugin()
     )
-    
+
     # create an ANTFS host from configuration
     host = antd.cfg.create_antfs_host()
     try:
@@ -90,7 +91,7 @@ def downloader():
                     _log.info("Pairing with device.")
                     client_id = host.auth(pair=not args.daemon)
                     raw_name = time.strftime("%Y%m%d-%H%M%S.raw")
-                    raw_full_path = antd.cfg.get_path("antd", "raw_output_dir", raw_name, 
+                    raw_full_path = antd.cfg.get_path("antd", "raw_output_dir", raw_name,
                                                       {"device_id": hex(host.device_id)})
                     with open(raw_full_path, "w") as file:
                         _log.info("Saving raw data to %s.", file.name)
@@ -112,11 +113,11 @@ def downloader():
                 if not args.daemon: break
                 failed_count = 0
             except antd.AntError:
-                _log.warning("Caught error while communicating with device, will retry.", exc_info=True) 
+                _log.warning("Caught error while communicating with device, will retry.", exc_info=True)
                 failed_count += 1
     finally:
         try: host.close()
         except Exception: _log.warning("Failed to cleanup resources on exist.", exc_info=True)
-    
-    
+
+
 # vim: ts=4 sts=4 et
