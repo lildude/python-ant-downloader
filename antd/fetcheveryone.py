@@ -1,18 +1,18 @@
 # Copyright (c) 2013, Colin Seymour.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 #   1. Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
-# 
+#
 #   2. Redistributions in binary form must reproduce the above
 #      copyright notice, this list of conditions and the following
 #      disclaimer in the documentation and/or other materials
 #      provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
 # ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -74,7 +74,7 @@ class Fetcheveryone(plugin.Plugin):
                 self.login()
                 self.upload(format, file)
                 result.append(file)
-            plugin.publish_data(device_sn, "notif_fetch", files)
+            plugin.publish_data(device_sn, "notif_FetchEveryone", files)
         except Exception:
             _log.warning("Failed to upload to Fetcheveryone.", exc_info=True)
         finally:
@@ -105,7 +105,7 @@ class Fetcheveryone(plugin.Plugin):
         else:
             self.logged_in = True
 
-    
+
     def upload(self, format, file_name):
         import poster.encode
         with open(file_name) as file:

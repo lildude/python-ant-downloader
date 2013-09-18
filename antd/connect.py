@@ -78,7 +78,7 @@ class GarminConnect(plugin.Plugin):
                 self.login()
                 self.upload(format, file)
                 result.append(file)
-            plugin.publish_data(device_sn, "notif_connect", files)
+            plugin.publish_data(device_sn, "notif_Garmin_Connect", files)
         except Exception:
             _log.warning("Failed to uplaod to Garmin Connect.", exc_info=True)
         finally:

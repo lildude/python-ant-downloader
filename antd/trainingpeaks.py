@@ -56,7 +56,7 @@ class TrainingPeaks(plugin.Plugin):
             for file in files:
                 self.upload(format, file)
                 result.append(file)
-            plugin.publish_data(device_sn, "notif_trainingpeaks", files)
+            plugin.publish_data(device_sn, "notif_TrainingPeaks", files)
         except Exception:
             _log.warning("Failed to upload to TrainingPeaks.", exc_info=True)
         finally:
