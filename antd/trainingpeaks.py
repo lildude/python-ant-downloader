@@ -30,8 +30,6 @@
 
 
 import logging
-import os
-import sys
 import urllib
 import urllib2
 
